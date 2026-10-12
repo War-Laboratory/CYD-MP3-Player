@@ -60,7 +60,7 @@
 #define CYD_BOARD_2432S028R_ST7789 29   // same 2.8" board, ST7789 panel instead
 
 #ifndef CYD_BOARD
-#define CYD_BOARD CYD_BOARD_2432S028R_ST7789
+#define CYD_BOARD CYD_BOARD_2432S028R
 #endif
 
 // ---------------------------------------------------------------------------
