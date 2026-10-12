@@ -26,7 +26,7 @@ jobs:
           mkdir -p "$HOME/Arduino/libraries"
           git clone --depth 1 --branch v1.8.11 https://github.com/pschatzmann/ESP32-A2DP.git "$HOME/Arduino/libraries/ESP32-A2DP"
           git clone --depth 1 --branch v0.9.4 https://github.com/pschatzmann/arduino-libhelix.git "$HOME/Arduino/libraries/arduino-libhelix"
-          cp config/User_Setup_2432S028R_ST7789.h.template "$HOME/Arduino/libraries/TFT_eSPI/User_Setup.h"
+          cp config/User_Setup_2432S028R_ILI9341.h.template "$HOME/Arduino/libraries/TFT_eSPI/User_Setup.h"
 
       - name: Build firmware
         run: |
