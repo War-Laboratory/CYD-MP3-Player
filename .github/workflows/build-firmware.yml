@@ -1,0 +1,45 @@
+
+name: Build CYD MP3 Firmware
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get source code
+        uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install ESP32 platform
+        run: |
+          arduino-cli config init
+          arduino-cli core update-index --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core install esp32:esp32@3.3.10 --additional-urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+
+      - name: Install libraries
+        run: |
+          arduino-cli lib install TFT_eSPI
+          mkdir -p "$HOME/Arduino/libraries"
+          git clone --depth 1 --branch v1.8.11 https://github.com/pschatzmann/ESP32-A2DP.git "$HOME/Arduino/libraries/ESP32-A2DP"
+          git clone --depth 1 --branch v0.9.4 https://github.com/pschatzmann/arduino-libhelix.git "$HOME/Arduino/libraries/arduino-libhelix"
+          cp config/User_Setup_2432S028R_ST7789.h.template "$HOME/Arduino/libraries/TFT_eSPI/User_Setup.h"
+
+      - name: Build firmware
+        run: |
+          chmod +x tools/*.sh
+          ./tools/sync_shared.sh
+          mkdir -p app/build/player app/build/uploader
+          arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=min_spiffs --output-dir app/build/player app
+          arduino-cli compile --fqbn esp32:esp32:esp32:PartitionScheme=min_spiffs --build-property compiler.cpp.extra_flags=-DCYD_UPLOADER --build-property compiler.c.extra_flags=-DCYD_UPLOADER --output-dir app/build/uploader app
+
+      - name: Upload compiled firmware
+        uses: actions/upload-artifact@v4
+        with:
+          name: cyd-mp3-compiled
+          path: |
+            app/build/player/*.bin
+            app/build/uploader/*.bin
